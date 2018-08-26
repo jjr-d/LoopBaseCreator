@@ -84,4 +84,21 @@ namespace WaveFun
             sChunkID = "data";
         }
     }
+
+    public class InfoChunk
+    {
+        public string sChunkId;    // "info"
+        public uint dwChunkSize;    // Length of infoText
+        public string infoText;     // Text in the info chunk
+
+        public InfoChunk(string text)
+        {
+            sChunkId = "INFO";
+
+            // align by 4 bytes (perhaps not necessary)
+            int alignCount = (4 - (text.Length % 4) % 4);
+            infoText = text + new String(' ', alignCount);
+            dwChunkSize = (uint)(text.Length + alignCount);
+        }
+    }
 }

@@ -97,8 +97,10 @@ namespace LoopBaseCreator
                     beatDuration = "eighth-note";
                     break;
             }
-            saveFileDialog1.FileName = nudBpm.Value.ToString() + "bpm_" + nudNumberBars.Value.ToString() 
-                + "bars_" + nudTimeSigTop.Value.ToString() + "-" + cbTimeSigBottom.SelectedItem + "_" +  beatDuration + "-beat.wav";
+            string description = nudBpm.Value.ToString() + "bpm_" + nudNumberBars.Value.ToString()
+                + "bars_" + nudTimeSigTop.Value.ToString() + "-" + cbTimeSigBottom.SelectedItem + "_" + beatDuration + "-beat";
+
+            saveFileDialog1.FileName = description + ".wav";
             saveFileDialog1.Filter = "Wav file|*.wav";
             saveFileDialog1.Title = "Save empty mono loop";
             saveFileDialog1.ShowDialog();
@@ -110,7 +112,7 @@ namespace LoopBaseCreator
                 //System.IO.FileStream fs =
                 //   (System.IO.FileStream)saveFileDialog1.OpenFile();
 
-                WaveGenerator wave = new WaveGenerator(nbrSamples);
+                WaveGenerator wave = new WaveGenerator(nbrSamples, programName + " " + programVersion + ": " + description);
                 wave.Save(saveFileDialog1.FileName);
 
                 //fs.Close();

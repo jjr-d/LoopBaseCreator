@@ -34,6 +34,7 @@ namespace WaveFun
         WaveHeader header;
         WaveFormatChunk format;
         WaveDataChunk data;
+        InfoChunk info;
 
         /// <summary>
         /// Initializes the object and generates a wave.
@@ -80,12 +81,13 @@ namespace WaveFun
         }
 
         // JJR: create empty wav
-        public WaveGenerator(uint sampleCount)
+        public WaveGenerator(uint sampleCount, string infoText)
         {
             // Init chunks
             header = new WaveHeader();
             format = new WaveFormatChunk();
             data = new WaveDataChunk();
+            info = new InfoChunk(infoText);
 
             // Fill the data array with sample data
 
@@ -93,15 +95,6 @@ namespace WaveFun
 
             // Initialize the 16-bit array; default initialization to 0.
             data.shortArray = new short[numSamples];
-
-            //for (uint i = 0; i < numSamples - 1; i++)
-            //{
-            //    // Fill with no signal
-            //    for (int channel = 0; channel < format.wChannels; channel++)
-            //    {
-            //        data.shortArray[i + channel] = 0;
-            //    }
-            //}
 
             // Calculate data chunk size in bytes
             data.dwChunkSize = (uint)(data.shortArray.Length * (format.wBitsPerSample / 8));
@@ -131,6 +124,14 @@ namespace WaveFun
                 writer.Write(header.dwFileLength);
                 writer.Write(header.sRiffType.ToCharArray());
 
+                if (info != null)
+                {
+                    // Write the info chunk
+                    writer.Write(info.sChunkId.ToCharArray());
+                    writer.Write(info.dwChunkSize);
+                    writer.Write(info.infoText.ToCharArray());
+                }
+
                 // Write the format chunk
                 writer.Write(format.sChunkID.ToCharArray());
                 writer.Write(format.dwChunkSize);
@@ -149,6 +150,7 @@ namespace WaveFun
                     writer.Write(dataPoint);
                 }
 
+                // Fix file size in the header now that we know it.
                 writer.Seek(4, SeekOrigin.Begin);
                 uint filesize = (uint)writer.BaseStream.Length;
                 writer.Write(filesize - 8);
